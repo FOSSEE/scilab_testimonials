@@ -1,0 +1,459 @@
+<?php
+function scilab_testimonials_menu()
+{
+    $items = array();
+    $items["testimonials"] = array(
+        "title" => "Testimonials",
+        "page callback" => "scilab_testimonials_display_all",
+        "access arguments" => array("view testimonials"),
+        "type" => MENU_CALLBACK,
+    );
+    $items["testimonials/textbook-companion"] = array(
+        "title" => "Textbook Companion",
+        "page callback" => "scilab_testimonials_display_tbc",
+        "access arguments" => array("view testimonials"),
+        "type" => MENU_LOCAL_TASK,
+        "weight" => 0,
+    );
+    $items["testimonials/lab-migration"] = array(
+        "title" => "Lab Migration",
+        "page callback" => "scilab_testimonials_display_lm",
+        "access arguments" => array("view testimonials"),
+        "type" => MENU_LOCAL_TASK,
+        "weight" => 1,
+    );
+    $items["testimonials/hackathon"] = array(
+        "title" => "Hackathon",
+        "page callback" => "scilab_testimonials_display_hackathon",
+        "access arguments" => array("view testimonials"),
+        "type" => MENU_LOCAL_TASK,
+        "weight" => 2,
+    );
+    $items["testimonials/add"] = array(
+        "title" => "Add Testimonials",
+        "page callback" => "scilab_testimonials_add_all",
+        "access arguments" => array("manage testimonials"),
+        "weight" => 15
+    );
+    $items["testimonials/edit"] = array(
+        "title" => "Edit Testimonials",
+        "page callback" => "scilab_testimonials_edit_all",
+        "access arguments" => array("manage testimonials"),
+        "weight" => 16
+    );
+    $items["testimonials/delete"] = array(
+        "title" => "Delete Testimonial",
+        "page callback" => "scilab_testimonials_delete_all",
+        "access arguments" => array("manage testimonials"),
+        "type" => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function scilab_testimonials_permission()
+{
+    return array(
+        "view testimonials" => array(
+            "title" => t("view testimonials"),
+            'restrict access' => true,
+        ),
+        "manage testimonials" => array(
+            "title" => t("manage testimonials"),
+            'restrict access' => true,
+        ),
+    );
+}
+
+function scilab_testimonials_add_form($form, &$form_state, $testimonial_id = 0)
+{
+    /*$query = "
+    SELECT * FROM testimonials
+    WHERE id = {$testimonial_id}
+    ";
+    $result = db_query($query);*/
+    $testimonial_id = arg(2);
+    $query = db_select('testimonials');
+    $query->fields('testimonials');
+    $query->condition('id', $testimonial_id);
+    $result = $query->execute();
+    $row = $result->fetchObject();
+
+    $form = array();
+    $form["name"] = array(
+        "#type" => "textfield",
+        "#title" => "Name",
+        "#default_value" => ($row && isset($row->name)) ? $row->name : '',
+        "#required" => true,
+    );
+    $form["department"] = array(
+        "#type" => "textfield",
+        "#title" => "Department/Specialization",
+        "#default_value" => ($row && isset($row->department)) ? $row->department : '',
+        "#required" => true,
+    );
+    $form["university"] = array(
+        "#type" => "textfield",
+        "#title" => "University/Organisation",
+        "#default_value" => ($row && isset($row->university)) ? $row->university : '',
+        "#required" => true,
+    );
+    $form["contribution"] = array(
+        "#type" => "select",
+        "#title" => "Contribution",
+        "#default_value" => ($row && isset($row->contribution)) ? $row->contribution : '',
+        "#options" => _contributor_options(),
+        "#required" => true,
+    );
+    $form["reference"] = array(
+        "#type" => "textfield",
+        "#title" => "Reference",
+        "#default_value" => ($row && isset($row->reference)) ? $row->reference : '',
+        "#required" => true,
+        "#description" => t("Such as tbc name, lab name, toolbox contribution")
+    );
+    $form["body"] = array(
+        "#type" => "textarea",
+        "#title" => "Testimonial",
+        "#default_value" => ($row && isset($row->body)) ? $row->body : '',
+        "#required" => true,
+    );
+    $form["link"] = array(
+        "#type" => "textfield",
+        "#title" => "Video link",
+        "#default_value" => ($row && isset($row->link)) ? $row->link : '',
+    );
+    $form["testimonial_id"] = array(
+        "#type" => "hidden",
+        "#value" => $testimonial_id,
+    );
+    $form["submit"] = array(
+        "#type" => "submit",
+        "#value" => "Submit",
+    );
+    return $form;
+}
+
+function scilab_testimonials_add_form_validate($form, &$form_state)
+{
+    // for future use
+}
+
+function scilab_testimonials_add_form_submit($form, &$form_state)
+{
+    $v = $form_state["values"];
+    if ($v["testimonial_id"]) {
+        /*$query = "
+        UPDATE testimonials SET
+        name = '%s', department = '%s', university = '%s',
+        contribution = '%s', reference = '%s', body = '%s'
+        WHERE id = %d
+        ";
+        $result = db_query($query,
+        $v["name"], $v["department"], $v["university"],
+        $v["contribution"], $v["reference"], $v["body"],
+        $v["testimonial_id"]
+        );*/
+
+        $query = db_update('testimonials');
+        $query->fields(array(
+            'name' => $v["name"],
+            'department' => $v["department"],
+            'university' => $v["university"],
+            'contribution' => $v["contribution"],
+            'reference' => $v["reference"],
+            'body' => $v["body"],
+            'link' => $v["link"],
+        ));
+        $query->condition('id', $v["testimonial_id"]);
+        $result = $query->execute();
+    } else {
+        /*$query = "
+        INSERT INTO testimonials
+        (name, department, university, contribution, reference, body)
+        VALUES
+        ('%s', '%s', '%s', '%s', '%s', '%s')
+        ";
+        $result = db_query($query,
+        $v["name"], $v["department"], $v["university"],
+        $v["contribution"], $v["reference"], $v["body"]
+        );*/
+
+        $query = "
+                INSERT INTO testimonials
+                (name, department, university, contribution, reference, body, link)
+                VALUES
+                (:name, :department, :university, :contribution, :reference, :body, :link)
+                ";
+        $args = array(
+            ':name' => $v["name"],
+            ':department' => $v["department"],
+            ':university' => $v["university"],
+            ':contribution' => $v["contribution"],
+            ':reference' => $v["reference"],
+            ':body' => $v["body"],
+            ':link' => $v["link"],
+        );
+
+        $result = db_query($query, $args);
+    }
+    if (!$result) {
+        drupal_set_message("Something went wrong, please try again.", "error");
+    } else {
+        drupal_set_message("Testimonial added successfully", "status");
+    }
+}
+
+function scilab_testimonials_add_all()
+{
+    $page_content = "";
+    $testimonials_add_form = drupal_get_form("scilab_testimonials_add_form");
+    $page_content .= drupal_render($testimonials_add_form);
+    return $page_content;
+}
+
+function scilab_testimonials_edit_all($testimonial_id = 0)
+{
+
+    $page_content = "";
+
+    if ($testimonial_id) {
+
+        $testimonials_add_form = drupal_get_form("scilab_testimonials_add_form", $testimonial_id);
+        $page_content .= drupal_render($testimonials_add_form);
+    } else {
+        /*$query = "
+        SELECT * FROM testimonials
+        ORDER BY time DESC
+        ";
+        $result = db_query($query);*/
+        $query = db_select('testimonials');
+        $query->fields('testimonials');
+        $query->orderBy('time', 'DESC');
+        $result = $query->execute();
+        $headers = array(
+            "Name", "University", "Contribution", "Action",
+        );
+        $rows = array();
+        while ($row = $result->fetchObject()) {
+            $item = array(
+                $row->name,
+                $row->university,
+                $row->contribution,
+                l("Edit", "testimonials/edit/{$row->id}") . " | " .
+                l("Delete", "testimonials/delete/{$row->id}"),
+            );
+            array_push($rows, $item);
+        }
+        //$page_content .= theme("table", $headers, $rows);
+        $page_content .= theme('table', array('header' => $headers, 'rows' => $rows));
+    }
+    return $page_content;
+}
+
+function scilab_testimonials_display_hackathon()
+{
+    return scilab_testimonials_display_all('hackathon');
+
+}
+function scilab_testimonials_display_tbc()
+{
+    return scilab_testimonials_display_all('tbc');
+
+}
+function scilab_testimonials_display_lm()
+{
+    return scilab_testimonials_display_all('lm');
+
+}
+
+function scilab_testimonials_display_all($event = null)
+{
+    $page_content = "";
+    if ($event == 'hackathon') {
+        /*$query = "
+        SELECT * FROM testimonials
+        ORDER BY id DESC
+        ";
+        $result = pager_query($query, 4, 0, "SELECT COUNT(*) FROM testimonials");*/
+        $query = db_select('testimonials');
+        $query->fields('testimonials');
+        $query->condition('contribution', 'Hackathon', '=');
+        $query->orderBy('id', 'DESC');
+        $result = $query->extend('PagerDefault')->limit(6)->execute();
+        $page_content .= "<div id='testimonials-wrapper'>";
+        if(!empty($result->fetchObject())){
+        while ($row = $result->fetchObject()) {
+            if (trim($row->link) == "") {
+                $page_content .= "
+                <div class='testimonial'>
+                    {$row->body}
+                    <div class='author'>
+                        - {$row->name}, {$row->department}, {$row->university}<br>
+                        ({$row->contribution}: {$row->reference})
+                    </div>
+                </div>
+            ";
+            } else {
+                $page_content .= "
+                <div class='testimonial'><center>
+                <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
+                <source src={$row->link} type='video/mp4'>
+                                               </video></center><br>
+                                               {$row->body}
+                    <div class='author'>
+                        - {$row->name}, {$row->department}, {$row->university}<br>
+                        ({$row->contribution}: {$row->reference})
+                    </div>
+                </div>
+            ";
+            }
+        }
+      }
+        else{
+          $page_content .= "No testimonials shared yet!";
+        }
+        $page_content .= "</div> <!-- /#testimonials-wrapper -->";
+
+    } elseif($event == 'tbc') {
+        $query = db_select('testimonials');
+        $query->fields('testimonials');
+        $query->condition('contribution', 'Textbook Companion', '=');
+        $query->orderBy('id', 'DESC');
+        $result = $query->extend('PagerDefault')->limit(6)->execute();
+
+        $page_content .= "<div id='testimonials-wrapper'>";
+        if(!empty($result->fetchObject())){
+        while ($row = $result->fetchObject()) {
+            if (trim($row->link) == "") {
+                $page_content .= "
+                <div class='testimonial'>
+                    {$row->body}
+                    <div class='author'>
+                        - {$row->name}, {$row->department}, {$row->university}<br>
+                        ({$row->contribution}: {$row->reference})
+                    </div>
+                </div>
+            ";
+            } else {
+                $page_content .= "
+                <div class='testimonial'><center>
+                <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
+                <source src={$row->link} type='video/mp4'>
+                                               </video></center><br>
+                                               {$row->body}
+                    <div class='author'>
+                        - {$row->name}, {$row->department}, {$row->university}<br>
+                        ({$row->contribution}: {$row->reference})
+                    </div>
+                </div>
+            ";
+            }
+          }
+        }
+          else{
+            $page_content .= "No testimonials shared yet!";
+          }
+
+        $page_content .= "</div> <!-- /#testimonials-wrapper -->";
+    } elseif ($event == 'lm') {
+        $query = db_select('testimonials');
+        $query->fields('testimonials');
+        $query->condition('contribution', 'Lab Migration', '=');
+        $query->orderBy('id', 'DESC');
+        $result = $query->extend('PagerDefault')->limit(6)->execute();
+
+        $page_content .= "<div id='testimonials-wrapper'>";
+        if(!empty($result->fetchObject())){
+        while ($row = $result->fetchObject()) {
+            if (trim($row->link) == "") {
+                $page_content .= "
+               <div class='testimonial'>
+                   {$row->body}
+                   <div class='author'>
+                       - {$row->name}, {$row->department}, {$row->university}<br>
+                       ({$row->contribution}: {$row->reference})
+                   </div>
+               </div>
+           ";
+            } else {
+                $page_content .= "
+               <div class='testimonial'><center>
+               <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
+               <source src={$row->link} type='video/mp4'>
+                                              </video></center><br>
+                                              {$row->body}
+                   <div class='author'>
+                       - {$row->name}, {$row->department}, {$row->university}<br>
+                       ({$row->contribution}: {$row->reference})
+                   </div>
+               </div>
+           ";
+          }
+        }
+      }
+        else{
+          $page_content .= "No testimonials shared yet!";
+        }
+
+        $page_content .= "</div> <!-- /#testimonials-wrapper -->";
+
+    } else {
+        $query = db_select('testimonials');
+        $query->fields('testimonials');
+        $query->orderBy('id', 'DESC');
+        $result = $query->extend('PagerDefault')->limit(6)->execute();
+
+        $page_content .= "<div id='testimonials-wrapper'>";
+        if(!empty($result->fetchObject())){
+        while ($row = $result->fetchObject()) {
+            if (trim($row->link) == "") {
+                $page_content .= "
+               <div class='testimonial'>
+                   {$row->body}
+                   <div class='author'>
+                       - {$row->name}, {$row->department}, {$row->university}<br>
+                       ({$row->contribution}: {$row->reference})
+                   </div>
+               </div>
+           ";
+            } else {
+                $page_content .= "
+               <div class='testimonial'><center>
+               <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
+               <source src={$row->link} type='video/mp4'>
+                                              </video></center><br>
+                                              {$row->body}
+                   <div class='author'>
+                       - {$row->name}, {$row->department}, {$row->university}<br>
+                       ({$row->contribution}: {$row->reference})
+                   </div>
+               </div>
+           ";
+          }
+        }
+      }
+        else{
+          $page_content .= "No testimonials shared yet!";
+        }
+
+        $page_content .= "</div> <!-- /#testimonials-wrapper -->";
+
+    }
+    //$page_content .= theme("pager", NULL, 4, 0);
+    $page_content .= theme('pager', array('header' => null, 'rows' => 4));
+    return $page_content;
+}
+
+function scilab_testimonials_init()
+{
+    drupal_add_css(drupal_get_path("module", "scilab_testimonials") . "/css/scilab_testimonials.css");
+}
+
+function _contributor_options()
+{
+    $contributor_options = array("Lab Migration" => "Lab Migration",
+        "Textbook Companion" => "Textbook Companion",
+        "Hackathon" => "Hackathon",
+    );
+    return $contributor_options;
+}
