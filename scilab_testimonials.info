@@ -1,0 +1,5 @@
+name = Scilab Testimonials
+description = To manage and display scilab testimonials
+core = 7.x
+package = IITB
+project = "scilab_testimonials"
