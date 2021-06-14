@@ -23,7 +23,7 @@ function scilab_testimonials_menu()
         "weight" => 1,
     );
     $items["testimonials/hackathon"] = array(
-        "title" => "Hackathon",
+        "title" => "Scilab Toolbox Hackathon",
         "page callback" => "scilab_testimonials_display_hackathon",
         "access arguments" => array("view testimonials"),
         "type" => MENU_CALLBACK,
