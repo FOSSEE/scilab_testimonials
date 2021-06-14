@@ -4,7 +4,7 @@ function scilab_testimonials_menu()
     $items = array();
     $items["testimonials"] = array(
        "title" => "Testimonials",
-       "page callback" => "scilab_testimonials_display_all",
+       "page callback" => "scilab_testimonials_display_tbc",
        "access arguments" => array("view testimonials"),
        //"type" => MENU_CALLBACK,
     );
@@ -12,7 +12,7 @@ function scilab_testimonials_menu()
         "title" => "Textbook Companion",
         "page callback" => "scilab_testimonials_display_tbc",
         "access arguments" => array("view testimonials"),
-        "type" => MENU_LOCAL_TASK,
+        "type" => MENU_DEFAULT_LOCAL_TASK,
         "weight" => 0,
     );
     $items["testimonials/lab-migration"] = array(
@@ -345,11 +345,7 @@ function scilab_testimonials_display_lm()
         $page_content .= "<div id='testimonials-wrapper'>";
         while($row = $result->fetchObject()) {
             $page_content .= "
-                <div class='testimonial'>
-                <center>
-               <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
-               <source src='{$row->link}' type='video/mp4'>
-                                              </video></center><br>
+               <div class='testimonial'>
                     {$row->body}
                     <div class='author'>
                         - {$row->name}, {$row->department}, {$row->university}<br>
