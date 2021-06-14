@@ -2,31 +2,31 @@
 function scilab_testimonials_menu()
 {
     $items = array();
-    //$items["testimonials"] = array(
-    //    "title" => "Testimonials",
-    //    "page callback" => "scilab_testimonials_display_all",
-    //    "access arguments" => array("view testimonials"),
-    //    "type" => MENU_CALLBACK,
-    //);
+    $items["testimonials"] = array(
+       "title" => "Testimonials",
+       "page callback" => "scilab_testimonials_display_all",
+       "access arguments" => array("view testimonials"),
+       //"type" => MENU_CALLBACK,
+    );
     $items["testimonials/textbook-companion"] = array(
         "title" => "Textbook Companion",
         "page callback" => "scilab_testimonials_display_tbc",
         "access arguments" => array("view testimonials"),
-        "type" => MENU_CALLBACK,
+        "type" => MENU_LOCAL_TASK,
         "weight" => 0,
     );
     $items["testimonials/lab-migration"] = array(
         "title" => "Lab Migration",
         "page callback" => "scilab_testimonials_display_lm",
         "access arguments" => array("view testimonials"),
-        "type" => MENU_CALLBACK,
+        "type" => MENU_LOCAL_TASK,
         "weight" => 1,
     );
     $items["testimonials/hackathon"] = array(
         "title" => "Scilab Toolbox Hackathon",
         "page callback" => "scilab_testimonials_display_hackathon",
         "access arguments" => array("view testimonials"),
-        "type" => MENU_CALLBACK,
+        "type" => MENU_LOCAL_TASK,
         "weight" => 2,
     );
     $items["testimonials/add"] = array(
