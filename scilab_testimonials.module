@@ -265,7 +265,7 @@ function scilab_testimonials_display_hackathon()
         $hackathons = ['Scilab Toolbox Hackathon', 'Scilab Case Study Hackathon 2025'];
          $query = db_select('testimonials');
          $query->fields('testimonials');
-         $query->condition('contribution', $hackathons, 'IN')
+         $query->condition('contribution', $hackathons, 'IN');
          //$query->condition('contribution', 'Scilab Toolbox Hackathon', '=');
          $query->orderBy('id', 'DESC');
          $result = $query->extend('PagerDefault')->limit(6)->execute();
