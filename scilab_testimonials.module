@@ -23,11 +23,18 @@ function scilab_testimonials_menu()
         "weight" => 1,
     );
     $items["testimonials/hackathon"] = array(
-        "title" => "Scilab Toolbox Hackathon",
+        "title" => "Scilab Hackathon",
         "page callback" => "scilab_testimonials_display_hackathon",
         "access arguments" => array("view testimonials"),
         "type" => MENU_LOCAL_TASK,
         "weight" => 2,
+    );
+     $items["testimonials/case_study_hackathon"] = array(
+        "title" => "Scilab Case Study Hackathon",
+        "page callback" => "scilab_testimonials_display_case_study_hackathon",
+        "access arguments" => array("view testimonials"),
+        "type" => MENU_LOCAL_TASK,
+        "weight" => 3,
     );
     $items["testimonials/add"] = array(
         "title" => "Add Testimonials",
@@ -262,11 +269,15 @@ function scilab_testimonials_display_hackathon()
             ORDER BY id DESC
         ";
         $result = pager_query($query, 4, 0, "SELECT COUNT(*) FROM testimonials");*/
+        $hackathons = ['Scilab Toolbox Hackathon', 'Scilab Case Study Hackathon 2025'];
          $query = db_select('testimonials');
          $query->fields('testimonials');
-         $query->condition('contribution', 'Scilab Toolbox Hackathon', '=');
+         $query->condition('contribution', $hackathons, 'IN')
+         //$query->condition('contribution', 'Scilab Toolbox Hackathon', '=');
          $query->orderBy('id', 'DESC');
          $result = $query->extend('PagerDefault')->limit(6)->execute();
+         
+
 
 
         $page_content .= "<div id='testimonials-wrapper'>";
@@ -403,6 +414,7 @@ function _contributor_options()
     $contributor_options = array("Lab Migration" => "Lab Migration",
         "Textbook Companion" => "Textbook Companion",
         "Scilab Toolbox Hackathon" => "Scilab Toolbox Hackathon",
+         "Scilab Case Study Hackathon 2025" => "Scilab Case Study Hackathon 2025",
     );
     return $contributor_options;
 }
