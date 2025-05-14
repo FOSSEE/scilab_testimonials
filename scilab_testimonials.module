@@ -29,13 +29,6 @@ function scilab_testimonials_menu()
         "type" => MENU_LOCAL_TASK,
         "weight" => 2,
     );
-     $items["testimonials/case_study_hackathon"] = array(
-        "title" => "Scilab Case Study Hackathon",
-        "page callback" => "scilab_testimonials_display_case_study_hackathon",
-        "access arguments" => array("view testimonials"),
-        "type" => MENU_LOCAL_TASK,
-        "weight" => 3,
-    );
     $items["testimonials/add"] = array(
         "title" => "Add Testimonials",
         "page callback" => "scilab_testimonials_add_all",
