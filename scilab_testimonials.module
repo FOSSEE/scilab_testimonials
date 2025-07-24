@@ -275,6 +275,7 @@ function scilab_testimonials_display_hackathon()
 
         $page_content .= "<div id='testimonials-wrapper'>";
         while($row = $result->fetchObject()) {
+            $page_content .= "<div class='testimonial'>";
              if (!empty($row->link)) {
         $page_content .= "<center>
                <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
@@ -282,7 +283,7 @@ function scilab_testimonials_display_hackathon()
                                               </video></center><br>";
     }
             $page_content .= "
-                <div class='testimonial'>
+               
                 
                     {$row->body}
                     <div class='author'>
