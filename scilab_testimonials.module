@@ -412,6 +412,7 @@ function _contributor_options()
         "Textbook Companion" => "Textbook Companion",
         "Scilab Toolbox Hackathon" => "Scilab Toolbox Hackathon",
          "Scilab Case Study Hackathon 2025" => "Scilab Case Study Hackathon 2025",
+        "Scilab Case Study" => "Scilab Case Study"
     );
     return $contributor_options;
 }
