@@ -19,7 +19,7 @@ function scilab_testimonials_menu()
         "title" => "Case Study",
         "page callback" => "scilab_testimonials_display_case_study",
         "access arguments" => array("view testimonials"),
-        "type" => MENU_DEFAULT_LOCAL_TASK,
+        "type" => MENU_LOCAL_TASK,
         "weight" => 1,
     );
     $items["testimonials/lab-migration"] = array(
