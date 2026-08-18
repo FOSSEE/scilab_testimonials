@@ -19,7 +19,7 @@ function scilab_testimonials_menu()
         "title" => "Case Study",
         "page callback" => "scilab_testimonials_display_case_study",
         "access arguments" => array("view testimonials"),
-        "type" => MENU_DEFAULT_LOCAL_TASK,
+        "type" => MENU_LOCAL_TASK,
         "weight" => 1,
     );
     $items["testimonials/lab-migration"] = array(
@@ -322,21 +322,33 @@ function scilab_testimonials_display_case_study()
 
 
         $page_content .= "<div id='testimonials-wrapper'>";
-        while($row = $result->fetchObject()) {
+
+        while ($row = $result->fetchObject()) {
+
             $page_content .= "<div class='testimonial'>";
-                "<center>
-               <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
-               <source src='{$row->link}' type='video/mp4'>
-                                              </video></center><br>";
-              $page_content .=  " {$row->body}
-                    <div class='author'>
-                        - {$row->name}, {$row->department}, {$row->university}<br>
-                        ({$row->contribution}: {$row->reference})
-                    </div>
+
+            if (!empty($row->link)) {
+                $page_content .= "
+                    <center>
+                        <video title='{$row->name}' controls preload width='500' height='300'>
+                            <source src='{$row->link}' type='video/mp4'>
+                        </video>
+                    </center><br>";
+            }
+
+            if (!empty($row->body)) {
+                $page_content .= "{$row->body}";
+            }
+
+            $page_content .= "
+                <div class='author'>
+                    - {$row->name}<br>
+                    <b>{$row->contribution}</b>: {$row->reference}
                 </div>
-            ";
+            </div>";
         }
-        $page_content .= "</div> <!-- /#testimonials-wrapper -->";
+
+        $page_content .= "</div>";
         //$page_content .= theme("pager", NULL, 4, 0);
         $page_content .= theme('pager', array('header' => NULL, 'rows' => 4 ));
         return $page_content;
