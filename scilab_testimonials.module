@@ -15,19 +15,26 @@ function scilab_testimonials_menu()
         "type" => MENU_DEFAULT_LOCAL_TASK,
         "weight" => 0,
     );
+    $items["testimonials/case-study"] = array(
+        "title" => "Case Study",
+        "page callback" => "scilab_testimonials_display_case_study",
+        "access arguments" => array("view testimonials"),
+        "type" => MENU_DEFAULT_LOCAL_TASK,
+        "weight" => 1,
+    );
     $items["testimonials/lab-migration"] = array(
         "title" => "Lab Migration",
         "page callback" => "scilab_testimonials_display_lm",
         "access arguments" => array("view testimonials"),
         "type" => MENU_LOCAL_TASK,
-        "weight" => 1,
+        "weight" => 2,
     );
     $items["testimonials/hackathon"] = array(
         "title" => "Scilab Hackathon",
         "page callback" => "scilab_testimonials_display_hackathon",
         "access arguments" => array("view testimonials"),
         "type" => MENU_LOCAL_TASK,
-        "weight" => 2,
+        "weight" => 3,
     );
     $items["testimonials/add"] = array(
         "title" => "Add Testimonials",
@@ -289,6 +296,42 @@ function scilab_testimonials_display_hackathon()
                     <div class='author'>
                         - {$row->name}<br>
                         <b>{$row->contribution}</b>: {$row->reference}
+                    </div>
+                </div>
+            ";
+        }
+        $page_content .= "</div> <!-- /#testimonials-wrapper -->";
+        //$page_content .= theme("pager", NULL, 4, 0);
+        $page_content .= theme('pager', array('header' => NULL, 'rows' => 4 ));
+        return $page_content;
+
+}
+function scilab_testimonials_display_case_study()
+{
+  $page_content = "";
+        /*$query = "
+            SELECT * FROM testimonials
+            ORDER BY id DESC
+        ";
+        $result = pager_query($query, 4, 0, "SELECT COUNT(*) FROM testimonials");*/
+         $query = db_select('testimonials');
+         $query->fields('testimonials');
+         $query->condition('contribution', 'Scilab Case Study', '=');
+         $query->orderBy('id', 'DESC');
+         $result = $query->extend('PagerDefault')->limit(6)->execute();
+
+
+        $page_content .= "<div id='testimonials-wrapper'>";
+        while($row = $result->fetchObject()) {
+            $page_content .= "<div class='testimonial'>";
+                "<center>
+               <video title='{$row->name}' controls='' preload='' data-setup='{}' width='500' height='300'>
+               <source src='{$row->link}' type='video/mp4'>
+                                              </video></center><br>";
+              $page_content .=  " {$row->body}
+                    <div class='author'>
+                        - {$row->name}, {$row->department}, {$row->university}<br>
+                        ({$row->contribution}: {$row->reference})
                     </div>
                 </div>
             ";
